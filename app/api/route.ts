@@ -5,10 +5,23 @@ const openai = new OpenAI();
 
 export async function POST(req: Request) {
 
-    const systemPrompt = ''
+    const systemPrompt: string = `
+    You are an AI assistant that specializes in travel planning. Your goal is to help users plan their trips by retrieving and generating personalized travel recommendations. Users may upload their travel itineraries, provide details about their travel preferences, or describe their interests. Using a Retrieval-Augmented Generation (RAG) system, process the information provided to:
+
+    1. Retrieve relevant destination data.
+    2. Recommend local attractions.
+    3. Offer personalized travel tips.
+
+    Your responses should be informative, engaging, and tailored to the user's specific needs to ensure an enjoyable and well-planned travel experience.
+    `;
+
+    const data: Array<any> = await req.json();
 
     const completion = await openai.chat.completions.create({
-        messages: [{ role: "system", content: "You are a helpful assistant." }],
+        messages: [
+            { role: "system", content: "You are a helpful assistant." },
+            ...data
+        ],
         model: "gpt-4o-mini",
     });
 
