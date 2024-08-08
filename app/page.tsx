@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Container, Box, TextField, IconButton, Typography, Paper } from '@mui/material';
+import {Container, Box, TextField, IconButton, Typography, Paper, Button} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
 export default function Home() {
@@ -14,13 +14,21 @@ export default function Home() {
   };
 
   // state vars
-  const [messages, setMessages] = useState<Message>({
-    role: 'professional assistant',
-    content: 'Hello! I am an AI who can help you analyze and evaluate university privacy policies. How can I assist you today?'
-  });
+  const [messages, setMessages] = useState<Array<Message>>([]);
+  const [userMessage, setUserMessage] = useState<string>('');
 
-  const [message, setMessage] = useState<string>('');
-  const [userMessages, setUserMessages] = useState<Array<string>>(['']);
+  const sendMessage = async () => {
+    setMessages((messages) => [
+        ...messages,
+      {role: "user", content: userMessage},
+      {role: "assistant", content: ''}
+      ])
+
+    setUserMessage(''); // reset the user message
+
+    // Post request
+
+  }
 
   return (
       <Container maxWidth="lg" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#e1f1fd', padding: 2, borderRadius: '30px'}}>
@@ -29,24 +37,42 @@ export default function Home() {
           <Box sx={{ flexGrow: 1, overflowY: 'auto', marginBottom: 2 }}>
             {/* Chat messages will be displayed here */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Paper sx={{ alignSelf: 'flex-end', padding: 1, backgroundColor: '#c1d8f0', borderRadius: 2 }}>
-                <Typography>User: Hello!</Typography>
-              </Paper>
-              <Paper sx={{ alignSelf: 'flex-start', padding: 1, backgroundColor: '#d2deeb', borderRadius: 2 }}>
-                <Typography>Bot: Hi there!</Typography>
-              </Paper>
+              {/* Mapping logic */}
+              {
+                messages.map(({ role, content }, index) => (
+                    <Paper
+                        sx={{
+                          padding: 1,
+                          backgroundColor: role === 'user' ? '#c1d8f0' : '#d2deeb',
+                          borderRadius: 2,
+                          alignSelf: role === 'user' ? 'flex-end' : 'flex-start', // Corrected property
+                          justifyContent: role === 'user' ? 'flex-end' : 'flex-start' // This is not a valid property for Paper; use alignSelf for alignment
+                        }}
+                        key={index}
+                    >
+                      <Typography>{role === 'user' ? `User: ${content}` : `Bot: ${content}`}</Typography>
+                    </Paper>
+                ))
+              }
             </Box>
           </Box>
           <Box component="form" sx={{ display: 'flex', gap: 1 }}>
             <TextField
+                autoComplete="off"
                 fullWidth
                 variant="outlined"
                 placeholder="Type a message..."
                 sx={{ backgroundColor: 'white', borderRadius: 1 }}
+                value={userMessage}
+                onChange={(e) => setUserMessage(e.target.value)}
             />
-            <IconButton color="primary" sx={{ backgroundColor: '#4663ac', '&:hover': { backgroundColor: '#c1d8f0' } }}>
+            <Button
+                color="primary"
+                sx={{ backgroundColor: '#4663ac', '&:hover': { backgroundColor: '#c1d8f0' }}}
+                onClick={ sendMessage }
+            >
               <SendIcon />
-            </IconButton>
+            </Button>
           </Box>
         </Paper>
       </Container>
