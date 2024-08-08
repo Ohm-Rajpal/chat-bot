@@ -17,15 +17,25 @@ export async function POST(req: Request) {
 
     const data: Array<any> = await req.json();
 
-    const completion = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
         messages: [
             { role: "system", content: "You are a helpful assistant." },
             ...data
         ],
         model: "gpt-4o-mini",
+        stream: true // return data in chunks
     });
 
-    console.log(completion.choices[0]);
+    // sends response chunks asynchronously
+    const resContent : Array<any> = [];
+
+    for await (const chunk of stream) {
+        resContent.push(chunk.choices[0]?.delta?.content || "");
+    }
+    // join resContent into a string
+    const content : string = resContent.join('');
+
+    return new NextResponse(content);
 }
 
 export async function GET(request: Request) {}
