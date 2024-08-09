@@ -1,9 +1,10 @@
 'use client';
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {Container, Box, TextField, IconButton, Typography, Paper, Button} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import {PictureAsPdf} from "@mui/icons-material";
 
 export default function Home() {
 
@@ -88,14 +89,22 @@ export default function Home() {
     }
   }
 
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer && chatContainer.scrollHeight > chatContainer.clientHeight) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [messages]);
+
   return (
       <Container maxWidth="lg" sx={{ border: '5px solid #c1d8f0',height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#e1f1fd', padding: 2, borderRadius: '30px'}}>
         <Typography variant="h4" align="center" sx={{ marginBottom: 2, color: '#4663ac' }}>Chatbot</Typography>
         <Paper elevation={3} sx={{ border: '5px solid #c1d8f0', flexGrow: 1, display: 'flex', flexDirection: 'column', padding: 2, backgroundColor: '#c8d9ed' }}>
-          <Box sx={{ flexGrow: 1, overflowY: 'auto', marginBottom: 2, maxHeight: '80vh'}}
-          >
+          <Box ref={chatContainerRef} sx={{ flexGrow: 1, overflowY: 'auto', marginBottom: 2, maxHeight: '80vh'}}>
             {/* Chat messages will be displayed here */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginRight: '10px'}} >
               {/* Mapping logic */}
               {
                 messages.map(({ role, content }, index) => (
@@ -105,7 +114,7 @@ export default function Home() {
                           backgroundColor: role === 'user' ? '#c1d8f0' : '#d2deeb',
                           borderRadius: 2,
                           alignSelf: role === 'user' ? 'flex-end' : 'flex-start',
-                          justifyContent: role === 'user' ? 'flex-end' : 'flex-start'
+                          justifyContent: role === 'user' ? 'flex-end' : 'flex-start',
                         }}
                         key={index}
                     >
@@ -128,7 +137,14 @@ export default function Home() {
             />
             <Button
                 color="primary"
-                sx={{ backgroundColor: '#4663ac', '&:hover': { backgroundColor: '#c1d8f0' }}}
+                sx={{ backgroundColor: '#b4c9e0', '&:hover': { backgroundColor: '#f5c6ef' }}}
+                onClick={ sendMessage }
+            >
+              <PictureAsPdf />
+            </Button>
+            <Button
+                color="primary"
+                sx={{ backgroundColor: '#b4c9e0', '&:hover': { backgroundColor: '#f5c6ef' }}}
                 onClick={ sendMessage }
             >
               <SendIcon />
